@@ -1,0 +1,37 @@
+/* Vista de cliente: catálogo, tarjetas y carrito */
+/* cliente: catálogo + carrito */
+#cliente{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,440px);gap:clamp(20px,2.5vw,40px);align-items:start}
+#cliente > .buscador{grid-column:1;margin:0;padding:10px}
+#buscar{width:100%;font-size:18px;padding:16px 22px;border-radius:999px}
+#grilla{grid-column:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:clamp(18px,2vw,30px)}
+#grilla > .vacio{grid-column:1/-1}
+#cliente > .carrito{grid-column:2;grid-row:1 / span 2;position:sticky;top:24px;margin:0}
+@media (max-width:900px){
+  #cliente{grid-template-columns:1fr}
+  #cliente > .buscador,#grilla,#cliente > .carrito{grid-column:1;grid-row:auto}
+  #cliente > .carrito{position:static}
+}
+
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--sombra);transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 26px 44px -22px rgba(60,40,10,.4)}
+.media{position:relative;aspect-ratio:4/3;background:linear-gradient(145deg,var(--verde-suave),var(--tomate-suave));overflow:hidden}
+.foto{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
+.card:hover .foto{transform:scale(1.04)}
+.sin-foto{width:100%;height:100%;display:grid;place-items:center;font-family:Fraunces,Georgia,serif;font-weight:800;font-size:clamp(72px,8vw,120px);color:var(--verde);opacity:.55}
+.pill{position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;font-size:13px;font-weight:700;letter-spacing:.02em;padding:6px 12px;border-radius:999px;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;margin-right:8px;background:var(--verde)}
+.pill.no{color:var(--tomate)}
+.pill.no::before{background:var(--tomate)}
+.cuerpo{padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.precio{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:clamp(26px,2.2vw,34px);color:var(--verde);margin:0;font-variant-numeric:tabular-nums}
+.acciones{margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.acciones > span{min-width:32px;text-align:center;font-weight:700;font-size:20px}
+.acciones .btn:not([aria-label]){flex:1}
+.acciones .btn[aria-label]{width:46px;height:46px;padding:0;border-radius:50%;font-size:22px;line-height:1;display:grid;place-items:center}
+
+.carrito h2{margin-bottom:12px}
+.carrito ul{list-style:none;margin:0 0 14px;padding:0}
+.carrito li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:2px solid var(--ink)}
+.total strong{font-family:Fraunces,Georgia,serif;font-size:28px;color:var(--verde);font-variant-numeric:tabular-nums}
+#mensaje{margin-top:12px;padding:12px 14px;border:1.5px dashed var(--line);background:var(--paper);color:var(--ink);resize:vertical;font-size:14px;border-radius:14px}
