@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catálogo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/cliente.css">
+<link rel="stylesheet" href="css/personal.css">
+<link rel="stylesheet" href="css/finanzas.css">
+</head>
+<body>
+
+<main>
+  <section id="cliente">
+    <div class="panel buscador">
+      <input id="buscar" type="search" placeholder="¿Qué estás buscando?">
+    </div>
+    <div id="grilla" class="grilla"><p class="vacio">Cargando productos…</p></div>
+
+    <div class="panel carrito">
+      <h2>Tu compra</h2>
+      <div id="carrito"></div>
+      <button id="confirmar" class="btn primario ancho" disabled>Confirmar pedido</button>
+      <button id="copiar" class="btn ancho" disabled style="margin-top:8px">Copiar mensaje</button>
+    </div>
+  </section>
+
+  <section id="login" hidden>
+    <div class="panel login">
+      <h2>Iniciar sesión</h2>
+      <form id="form-login" class="login-form">
+        <input id="l-email" type="email" placeholder="Email" required autocomplete="username">
+        <input id="l-pass" type="password" placeholder="Contraseña" required autocomplete="current-password">
+        <button class="btn primario" type="submit">Entrar</button>
+      </form>
+      <p id="l-aviso" class="vacio"></p>
+      <button id="volver-login" class="btn volver">← Volver al catálogo</button>
+    </div>
+  </section>
+
+  <section id="personal" hidden>
+    <div class="barra-top">
+      <button id="volver" class="btn volver">← Volver al catálogo</button>
+      <button id="salir" class="btn volver">Cerrar sesión</button>
+    </div>
+
+    <div class="panel">
+      <h2>Pedidos pendientes</h2>
+      <div id="lista-pedidos" class="pedidos"><p class="vacio">No hay pedidos pendientes.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>Cargar producto nuevo</h2>
+      <form id="form-producto" class="nuevo">
+        <input id="p-nombre" placeholder="Nombre" required maxlength="80">
+        <input id="p-precio" type="number" min="0" step="0.01" placeholder="Precio $" required>
+        <input id="p-costo" type="number" min="0" step="0.01" placeholder="Precio costo $" required>
+        <input id="p-stock" type="number" min="0" step="1" placeholder="Stock inicial" required>
+        <input id="p-foto" type="file" accept="image/*" style="grid-column:1/-1">
+        <button class="btn primario" type="submit">Agregar al catálogo</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h2>Stock</h2>
+      <div id="tabla-stock"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Finanzas</h2>
+      <div id="finanzas"><p class="vacio">Cargando finanzas…</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>Movimientos recientes</h2>
+      <ul id="lista-mov" class="mov"><li class="vacio">Sin movimientos todavía.</li></ul>
+    </div>
+  </section>
+
+  <footer id="pie" class="pie">
+    <p id="aviso"></p>
+    <button id="ir-personal" class="enlace">Iniciar sesión</button>
+  </footer>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
