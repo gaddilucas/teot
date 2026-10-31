@@ -1,22 +1,43 @@
 import { estado } from './estado.js';
 import { aviso } from './utils.js';
+import { cargarCategorias } from './datos/categorias.js';
 import { cargarProductos } from './datos/productos.js';
 import { cargarPedidos } from './datos/pedidos.js';
 import { cargarMovimientos } from './datos/movimientos.js';
 import { escucharCambios } from './datos/tiempo-real.js';
 import { renderCatalogo, initCatalogo } from './cliente/catalogo.js';
 import { initCarrito } from './cliente/carrito.js';
+import { initMenu } from './cliente/menu.js';
 import { haySesion, initSesion } from './personal/sesion.js';
 import { renderPedidos, initPedidos } from './personal/pedidos.js';
 import { renderStock, initStock } from './personal/stock.js';
 import { initAlta } from './personal/alta.js';
+import { renderCategoriasAdmin, renderSelectsCategorias, initCategorias } from './personal/categorias.js';
 import { renderMovimientos } from './personal/movimientos.js';
 import { renderFinanzas, initFinanzas } from './finanzas/vista.js';
+
+async function refrescarCategorias(){
+  if (!(await cargarCategorias())) return;
+  // Si la categoría elegida ya no existe, vuelve a "Todas"
+  const sel = estado.categoriaSeleccionada;
+  if (sel !== 'todas' && sel !== 'sin' && !estado.categorias.some(c => c.id === sel)){
+    estado.categoriaSeleccionada = 'todas';
+  }
+  renderCatalogo();
+  if (estado.isStaff){
+    renderSelectsCategorias();
+    renderCategoriasAdmin();
+    renderStock();
+  }
+}
 
 async function refrescarProductos(){
   if (!(await cargarProductos())) return;
   renderCatalogo();
-  if (estado.isStaff) renderStock();
+  if (estado.isStaff){
+    renderStock();
+    renderCategoriasAdmin();
+  }
 }
 
 async function refrescarPedidos(){
@@ -33,6 +54,8 @@ async function refrescarMovimientos(){
 }
 
 async function entrarPersonal(){
+  renderSelectsCategorias();
+  renderCategoriasAdmin();
   renderStock();
   await refrescarPedidos();
   await refrescarMovimientos();
@@ -46,18 +69,22 @@ function salirPersonal(){
 
 async function iniciar(){
   initCatalogo();
+  initMenu();
   initCarrito();
   initSesion({onEntrar: entrarPersonal, onSalir: salirPersonal});
   initPedidos();
   initStock();
   initAlta();
+  initCategorias();
   initFinanzas();
 
   estado.isStaff = await haySesion();
+  await refrescarCategorias();
   await refrescarProductos();
   if (estado.isStaff) await entrarPersonal();
 
   escucharCambios({
+    onCategorias: refrescarCategorias,
     onProductos: refrescarProductos,
     onPedidos: refrescarPedidos,
     onMovimientos: refrescarMovimientos,

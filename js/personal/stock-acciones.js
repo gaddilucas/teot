@@ -1,6 +1,6 @@
 import { sb } from '../supabase.js';
 import { estado } from '../estado.js';
-import { num, errorMsg, toast, conBloqueo } from '../utils.js';
+import { num, errorMsg, toast, conBloqueo, pedirConfirmacion } from '../utils.js';
 import { subirFoto } from './fotos.js';
 
 const MENSAJE = {entrada: 'Stock sumado.', salida: 'Stock restado.', venta: 'Venta registrada.'};
@@ -32,21 +32,8 @@ export async function guardarPrecios(boton){
   toast('Precios actualizados.');
 }
 
-// Primer toque: pide confirmar. Segundo toque dentro de 4 segundos: elimina.
 export function pedirEliminar(boton){
-  if (boton.dataset.confirmar !== '1'){
-    boton.dataset.confirmar = '1';
-    boton.textContent = '¿Seguro? Tocá de nuevo';
-    boton.classList.add('peligro');
-    clearTimeout(boton._t);
-    boton._t = setTimeout(() => {
-      boton.dataset.confirmar = '';
-      boton.textContent = 'Eliminar';
-      boton.classList.remove('peligro');
-    }, 4000);
-    return;
-  }
-  conBloqueo(() => eliminarProducto(boton.dataset.id));
+  pedirConfirmacion(boton, 'Eliminar', () => conBloqueo(() => eliminarProducto(boton.dataset.id)));
 }
 
 async function eliminarProducto(id){
@@ -54,6 +41,7 @@ async function eliminarProducto(id){
   const {error} = await sb.from('productos').delete().eq('id', id);
   if (error) return toast(errorMsg(error), 'error');
   delete estado.cantidades[id];
+  estado.seleccion.delete(id);
   toast(`"${p ? p.nombre : 'Producto'}" eliminado del catálogo.`);
 }
 
@@ -66,4 +54,15 @@ export async function cambiarFoto(id, archivo){
   } catch {
     toast('No se pudo cargar la foto. Probá con otra imagen.', 'error');
   }
+}
+
+// Sirve tanto para un producto como para varios marcados. Devuelve true si salió bien.
+export async function cambiarCategoria(ids, categoria_id){
+  const {error} = await sb.from('productos').update({categoria_id}).in('id', ids);
+  if (error){
+    toast(errorMsg(error), 'error');
+    return false;
+  }
+  toast(ids.length === 1 ? 'Categoría actualizada.' : `${ids.length} productos movidos.`);
+  return true;
 }

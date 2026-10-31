@@ -9,14 +9,17 @@
 <link rel="stylesheet" href="css/cliente.css">
 <link rel="stylesheet" href="css/personal.css">
 <link rel="stylesheet" href="css/finanzas.css">
+<link rel="stylesheet" href="css/categorias.css">
 </head>
 <body>
 
 <main>
   <section id="cliente">
     <div class="panel buscador">
+      <button id="menu-btn" class="menu-btn" aria-label="Ver categorías"><span class="linea"></span><span class="linea"></span><span class="linea"></span></button>
       <input id="buscar" type="search" placeholder="¿Qué estás buscando?">
     </div>
+    <h2 id="titulo-categoria" class="titulo-cat">Todas las categorías</h2>
     <div id="grilla" class="grilla"><p class="vacio">Cargando productos…</p></div>
 
     <div class="panel carrito">
@@ -58,13 +61,29 @@
         <input id="p-precio" type="number" min="0" step="0.01" placeholder="Precio $" required>
         <input id="p-costo" type="number" min="0" step="0.01" placeholder="Precio costo $" required>
         <input id="p-stock" type="number" min="0" step="1" placeholder="Stock inicial" required>
+        <select id="p-categoria" aria-label="Categoría" style="grid-column:1/-1"></select>
         <input id="p-foto" type="file" accept="image/*" style="grid-column:1/-1">
         <button class="btn primario" type="submit">Agregar al catálogo</button>
       </form>
     </div>
 
     <div class="panel">
+      <h2>Categorías</h2>
+      <form id="form-categoria" class="nueva-cat">
+        <input id="c-nombre" placeholder="Nombre de la categoría" required maxlength="60">
+        <button class="btn primario" type="submit">Crear categoría</button>
+      </form>
+      <ul id="lista-cats-admin" class="cats-admin"></ul>
+    </div>
+
+    <div class="panel">
       <h2>Stock</h2>
+      <div class="barra-mover">
+        <label><input type="checkbox" id="sel-todos"> Seleccionar todos</label>
+        <span id="sel-count">0 seleccionados</span>
+        <label>Mover a <select id="mover-a"></select></label>
+        <button id="mover-btn" class="btn primario">Mover seleccionados</button>
+      </div>
       <div id="tabla-stock"></div>
     </div>
 
@@ -85,6 +104,11 @@
   </footer>
 </main>
 
+<div id="menu-fondo" class="menu-fondo" hidden></div>
+<nav id="menu-categorias" class="menu-cats" aria-label="Categorías" hidden>
+  <div class="menu-cab"><strong>Categorías</strong><button id="menu-cerrar" class="btn" aria-label="Cerrar">✕</button></div>
+  <ul id="lista-categorias" class="lista-cats"></ul>
+</nav>
 <div id="toast" class="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>

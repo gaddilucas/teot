@@ -1,18 +1,32 @@
 import { estado } from '../estado.js';
-import { $, ars, esc, num, conBloqueo } from '../utils.js';
+import { $, ars, esc, num, toast, conBloqueo } from '../utils.js';
 import { urlFoto } from '../config.js';
-import { ajustar, guardarPrecios, pedirEliminar, cambiarFoto } from './stock-acciones.js';
+import { opcionesCategorias } from './categorias.js';
+import { ajustar, guardarPrecios, pedirEliminar, cambiarFoto, cambiarCategoria } from './stock-acciones.js';
 
 export function renderStock(){
+  // Quita de la selección los productos que ya no existen
+  estado.seleccion = new Set([...estado.seleccion].filter(id => estado.productos.some(p => p.id === id)));
   $('#tabla-stock').innerHTML = estado.productos.length
     ? estado.productos.map(filaProducto).join('')
     : '<p class="vacio">Todavía no hay productos. Cargá el primero arriba.</p>';
+  actualizarBarra();
+}
+
+// Actualiza el contador de la barra de selección
+export function actualizarBarra(){
+  const n = estado.seleccion.size;
+  $('#sel-count').textContent = n === 1 ? '1 seleccionado' : `${n} seleccionados`;
+  $('#sel-todos').checked = estado.productos.length > 0 && n === estado.productos.length;
 }
 
 function filaProducto(p){
+  const marcado = estado.seleccion.has(p.id) ? 'checked' : '';
   return `<div class="fila">
+    <label class="sel-wrap"><input type="checkbox" class="sel" data-sel="${esc(p.id)}" ${marcado} aria-label="Seleccionar ${esc(p.nombre)}"></label>
     <div class="info"><strong>${esc(p.nombre)}</strong><span>${ars.format(num(p.precio))} · stock: <b>${num(p.stock)}</b></span></div>
     <div class="precios">
+      <label>Categoría <select data-categoria="${esc(p.id)}">${opcionesCategorias(p.categoria_id)}</select></label>
       <label>Costo $ <input type="number" min="0" step="0.01" data-costo="${esc(p.id)}" value="${num(p.costo)}"></label>
       <label>Precio $ <input type="number" min="0" step="0.01" data-precio="${esc(p.id)}" value="${num(p.precio)}"></label>
       <button class="btn" data-accion="precios" data-id="${esc(p.id)}">Guardar precios</button>
@@ -46,10 +60,37 @@ export function initStock(){
   });
 
   tabla.addEventListener('change', e => {
+    const sel = e.target.closest('input[data-sel]');
+    if (sel){
+      if (sel.checked) estado.seleccion.add(sel.dataset.sel);
+      else estado.seleccion.delete(sel.dataset.sel);
+      actualizarBarra();
+      return;
+    }
+    const cat = e.target.closest('select[data-categoria]');
+    if (cat){
+      conBloqueo(() => cambiarCategoria([cat.dataset.categoria], cat.value || null));
+      return;
+    }
     const inp = e.target.closest('input[data-foto]');
     if (!inp || !inp.files[0]) return;
     const archivo = inp.files[0];
     inp.value = '';
     conBloqueo(() => cambiarFoto(inp.dataset.foto, archivo));
   });
+
+  $('#sel-todos').addEventListener('change', e => {
+    estado.seleccion = new Set(e.target.checked ? estado.productos.map(p => p.id) : []);
+    renderStock();
+  });
+
+  $('#mover-btn').addEventListener('click', () => conBloqueo(async () => {
+    const ids = [...estado.seleccion];
+    if (!ids.length) return toast('Marcá al menos un producto.', 'error');
+    const ok = await cambiarCategoria(ids, $('#mover-a').value || null);
+    if (ok){
+      estado.seleccion = new Set();
+      renderStock();
+    }
+  }));
 }

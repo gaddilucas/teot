@@ -12,6 +12,7 @@ export function initAlta(){
       const precio = parseFloat($('#p-precio').value);
       const costo = parseFloat($('#p-costo').value);
       const stock = parseInt($('#p-stock').value, 10);
+      const categoria_id = $('#p-categoria').value || null;
       if (!nombre || !Number.isFinite(precio) || precio < 0
           || !Number.isFinite(costo) || costo < 0
           || !Number.isFinite(stock) || stock < 0){
@@ -21,7 +22,7 @@ export function initAlta(){
         const archivo = $('#p-foto').files[0];
         const imagen_path = archivo ? await subirFoto(archivo) : null;
         const {data, error} = await sb.from('productos')
-          .insert({nombre, precio, costo, stock, imagen_path})
+          .insert({nombre, precio, costo, stock, imagen_path, categoria_id})
           .select()
           .single();
         if (error) throw error;

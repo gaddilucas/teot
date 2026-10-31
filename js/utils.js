@@ -20,6 +20,7 @@ export const fechaCorta = f => new Date(f).toLocaleString('es-AR', {dateStyle: '
 export function errorMsg(e){
   const msg = String(e?.message || '');
   if (e?.code === '42501') return 'No tenés permiso para esa acción. Revisá que hayas iniciado sesión.';
+  if (e?.code === '23505') return 'Ya existe un registro con ese nombre.';
   if (msg.includes('stock insuficiente')) return 'No hay stock suficiente para esa operación.';
   if (msg.includes('falta stock')) return msg.charAt(0).toUpperCase() + msg.slice(1) + '.';
   if (msg.includes('Invalid login')) return 'Email o contraseña incorrectos.';
@@ -53,4 +54,21 @@ export async function conBloqueo(fn){
   if (estado.ocupado) return;
   estado.ocupado = true;
   try { await fn(); } finally { estado.ocupado = false; }
+}
+
+// Primer toque: el botón pide confirmar. Segundo toque dentro de 4 segundos: ejecuta.
+export function pedirConfirmacion(boton, textoBase, ejecutar){
+  if (boton.dataset.confirmar !== '1'){
+    boton.dataset.confirmar = '1';
+    boton.textContent = '¿Seguro? Tocá de nuevo';
+    boton.classList.add('peligro');
+    clearTimeout(boton._t);
+    boton._t = setTimeout(() => {
+      boton.dataset.confirmar = '';
+      boton.textContent = textoBase;
+      boton.classList.remove('peligro');
+    }, 4000);
+    return;
+  }
+  ejecutar();
 }

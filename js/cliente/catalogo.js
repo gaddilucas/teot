@@ -3,15 +3,35 @@ import { $, ars, esc, num } from '../utils.js';
 import { urlFoto } from '../config.js';
 import { renderCarrito } from './carrito.js';
 
+export function nombreCategoria(){
+  const sel = estado.categoriaSeleccionada;
+  if (sel === 'todas') return 'Todas las categorías';
+  if (sel === 'sin') return 'Sin categoría';
+  return estado.categorias.find(c => c.id === sel)?.nombre || 'Todas las categorías';
+}
+
+function enCategoria(p){
+  const sel = estado.categoriaSeleccionada;
+  if (sel === 'todas') return true;
+  if (sel === 'sin') return !p.categoria_id;
+  return p.categoria_id === sel;
+}
+
 export function renderCatalogo(){
   const q = $('#buscar').value.trim().toLowerCase();
   // Los productos sin stock quedan al final; dentro de cada grupo siguen por nombre
   const lista = estado.productos
+    .filter(enCategoria)
     .filter(p => !q || String(p.nombre).toLowerCase().includes(q))
     .sort((a, b) => (num(b.stock) > 0) - (num(a.stock) > 0));
-  $('#grilla').innerHTML = lista.length
-    ? lista.map(tarjeta).join('')
-    : `<p class="vacio">${estado.productos.length ? 'No hay productos con ese nombre.' : 'Todavía no hay productos cargados.'}</p>`;
+
+  $('#titulo-categoria').textContent = nombreCategoria();
+
+  let vacio = 'No hay productos en esta categoría.';
+  if (!estado.productos.length) vacio = 'Todavía no hay productos cargados.';
+  else if (q) vacio = 'No hay productos con ese nombre.';
+
+  $('#grilla').innerHTML = lista.length ? lista.map(tarjeta).join('') : `<p class="vacio">${vacio}</p>`;
   renderCarrito();
 }
 
@@ -59,4 +79,6 @@ export function initCatalogo(){
 
   // El carrito avisa cuando se vacía después de un pedido
   document.addEventListener('carrito:cambio', renderCatalogo);
+  // El menú avisa cuando el cliente elige una categoría
+  document.addEventListener('categoria:cambio', renderCatalogo);
 }
