@@ -1,0 +1,40 @@
+/* Vista de celular: 4 productos a la vista y barra para terminar la compra */
+
+:root{--neon:#39ff14}
+
+/* Celular: 2 columnas, con más espacio entre productos */
+@media (max-width:640px){
+  main{padding:14px 12px}
+  #grilla{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 18px}
+  .card{border-radius:20px}
+  .cuerpo{padding:12px 12px 14px;gap:6px}
+  .card h3{font-size:16px}
+  .precio{font-size:19px}
+  .acciones{gap:6px}
+  .acciones .btn:not([aria-label]){min-height:40px;padding:8px 10px;font-size:14px}
+  .acciones .btn[aria-label]{width:40px;height:40px;font-size:18px}
+  .pill{top:8px;left:8px;font-size:11px;padding:4px 8px}
+  #buscar{font-size:16px;padding:12px 16px}
+  .menu-btn{width:46px;height:46px}
+  #titulo-categoria{font-size:20px}
+}
+
+/* Mensajes arriba en celular, para que no tapen la barra de compra */
+@media (max-width:900px){
+  .toast{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto}
+}
+
+/* Barra verde fluor que sube desde abajo al agregar productos */
+.barra-compra{
+  position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  transform:translate(-50%,160%);opacity:0;pointer-events:none;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s ease;
+  z-index:15;display:flex;align-items:center;gap:10px;
+  padding:10px 18px;border:0;border-radius:999px;
+  background:var(--neon);color:#0d0d0d;font:inherit;font-size:14px;font-weight:700;
+  letter-spacing:.02em;white-space:nowrap;cursor:pointer;
+  box-shadow:0 8px 24px rgba(57,255,20,.45);
+}
+.barra-compra.visible{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.barra-compra .n{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:#0d0d0d;color:var(--neon);font-size:12px}
+@media (min-width:901px){.barra-compra{display:none}}

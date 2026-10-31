@@ -17,6 +17,12 @@ function totalDe(items){
 export function renderCarrito(){
   const items = itemsCarrito();
   const btn = $('#confirmar');
+  const cantidad = items.reduce((s, {c}) => s + c, 0);
+
+  // Barra verde: aparece cuando hay algo en el carrito
+  $('#barra-compra').classList.toggle('visible', items.length > 0);
+  $('#barra-n').textContent = cantidad;
+
   if (!items.length){
     $('#carrito').innerHTML = '<p class="vacio">Tu carrito está vacío.</p>';
     btn.disabled = true;
@@ -35,6 +41,9 @@ export function renderCarrito(){
 export function initCarrito(){
   $('#confirmar').addEventListener('click', () => conBloqueo(confirmarPedido));
   $('#copiar').addEventListener('click', copiarMensaje);
+  $('#barra-compra').addEventListener('click', () => {
+    $('.carrito').scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
 }
 
 async function confirmarPedido(){
